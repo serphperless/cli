@@ -2,14 +2,17 @@
 
 This is the CLI tool used by developer to get started and deploy their applications.
 
+- [Installation](#installation)
+- [Usage](#usage)
+
+## Installation
+
+```
+npm install -g serphperless#master
+```
+
 ## Usage
 
-1. Install serphperless globally
 ```
-npm install -g serphperless
-```
-
-2. Get started with your `serphperless`
-```
-serphperless
+serphperless deploy
 ```

@@ -3,7 +3,7 @@ const nodeExternals = require('webpack-node-externals')
 const FlowBabelWebpackPlugin = require('flow-babel-webpack-plugin')
 
 module.exports = {
-    entry: './src/serphperless.js',
+    entry: './cmd/serphperless.js',
     target: 'node',
     externals: [nodeExternals()],
     node: {
