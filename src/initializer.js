@@ -78,11 +78,9 @@ export default class Initializer {
                         '&& composer req "sroze/openwhisk-bundle:^0.2"'
                     ;
 
-                    return new Promise((resolve, reject) => {
-                        return spawn({cmd: 'bash', args: ['-c', cmd]}).catch(code => {
-                            return Promise.reject('Could not install the \`sroze/openwhisk-bundle\` dependency');
-                        });
-                    })
+                    return spawn({cmd: 'bash', args: ['-c', cmd]}).catch(() => {
+                        return Promise.reject('Could not install the \`sroze/openwhisk-bundle\` dependency');
+                    });
                 })
             });
     }

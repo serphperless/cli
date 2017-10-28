@@ -9,12 +9,10 @@ import Deployer from '../src/deployer.js';
 import Initializer from '../src/initializer.js';
 import Filesystem from '../src/filesystem.js';
 
-
-// https://github.com/tj/commander.js/
-
 const main = async (argv_) => {
     program
         .version('0.1.0')
+        .option('-d, --debug', 'Enable the debug mode')
     ;
 
     program
@@ -23,7 +21,8 @@ const main = async (argv_) => {
         .action(function(options){
             let d = new Deployer(
                 new Initializer(io),
-                io
+                io,
+                program.debug
             );
 
             d.deploy(new Filesystem(process.cwd())).then(summary => {

@@ -2,9 +2,10 @@ const { spawn } = require('./process');
 const fs = require('fs-extra');
 
 export default class Deployer {
-    constructor(initializer, io) {
+    constructor(initializer, io, debug = false) {
         this.initializer = initializer;
         this.io = io;
+        this.debug = debug;
     }
 
     deploy(fileSystem) {
@@ -17,7 +18,7 @@ export default class Deployer {
 
     startDeployment(fileSystem, tryResolveIssues = true) {
         let stdout = '';
-        return spawn({cmd: 'serverless', args: ['deploy', '-v'], pipeStreams: false, processCallback: (bashProcess) => {
+        return spawn({cmd: 'serverless', args: ['deploy', '-v'], pipeStreams: this.debug, processCallback: (bashProcess) => {
             bashProcess.stdout.on('data', data => {
                 stdout += data;
 
