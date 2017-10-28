@@ -26,9 +26,19 @@ const main = async (argv_) => {
                 io
             );
 
-            d.deploy(new Filesystem(process.cwd())).then(() => {
-                console.log('DEPLOYED !')
-            });
+            d.deploy(new Filesystem(process.cwd())).then(summary => {
+                summary.functions.forEach(func => {
+                    io.section(func.name)
+
+                    if (func.endpoint) {
+                        io.write([
+                            `    Method: ${func.endpoint.method}`,
+                            `    URL: ${func.endpoint.url}`,
+                            ''
+                        ], true)
+                    }
+                });
+            }).catch(handleUnexpected);
         });
 
     program.parse(process.argv);

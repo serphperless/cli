@@ -39,6 +39,11 @@ export default class Initializer {
                         'functions:\n' +
                         '  '+name+':\n' +
                         '    handler: index.main\n' +
+                        '    events:\n' +
+                        '      - http:\n' +
+                        '          method: GET\n' +
+                        '          path: /\n' +
+                        '          resp: http' +
                         '\n' +
                         'plugins:\n' +
                         '  - serverless-openwhisk\n'
@@ -74,7 +79,7 @@ export default class Initializer {
                     ;
 
                     return new Promise((resolve, reject) => {
-                        return spawn('bash', ['-c', cmd]).catch(code => {
+                        return spawn({cmd: 'bash', args: ['-c', cmd]}).catch(code => {
                             return Promise.reject('Could not install the \`sroze/openwhisk-bundle\` dependency');
                         });
                     })

@@ -1,4 +1,5 @@
 const { spawn } = require('./process');
+const fs = require('fs-extra');
 
 export default class Deployer {
     constructor(initializer, io) {
@@ -8,29 +9,35 @@ export default class Deployer {
 
     deploy(fileSystem) {
         return this.initializer.assertInitialized(fileSystem).then(() => {
-            console.log('Starting the deployment');
+            this.io.comment('Starting the deployment...');
 
-            return this.startDeployment(fileSystem);
+            return this.startDeployment(fileSystem)
         })
     }
 
     startDeployment(fileSystem, tryResolveIssues = true) {
-        return new Promise((resolve, reject) => {
-            let stdout = '';
-            return spawn({cmd: 'serverless', args: ['deploy'], processCallback: (bashProcess) => {
-                bashProcess.stdout.on('data', data => {
-                    stdout += data;
-                });
-            }}).catch(code => {
-                if (tryResolveIssues && stdout.indexOf('Serverless plugin "serverless-openwhisk" not found.')) {
-                    return this.tryInstallServerLessDependencies(fileSystem).then(() => {
-                        return this.startDeployment(fileSystem, false)
-                    })
-                }
+        let stdout = '';
+        return spawn({cmd: 'serverless', args: ['deploy', '-v'], pipeStreams: false, processCallback: (bashProcess) => {
+            bashProcess.stdout.on('data', data => {
+                stdout += data;
 
-                return Promise.reject('Something went wrong while deploying the application')
+                if (data.indexOf('Serverless: Deploying Functions...') !== -1) {
+                    this.io.comment('Compiled functions')
+                } else if (data.indexOf('Serverless: Deployment successful!') !== -1) {
+                    this.io.comment('Deployment successful!')
+                }
             });
-        })
+        }}).catch(code => {
+            if (tryResolveIssues && stdout.indexOf('Serverless plugin "serverless-openwhisk" not found.')) {
+                return this.tryInstallServerLessDependencies(fileSystem).then(() => {
+                    return this.startDeployment(fileSystem, false)
+                })
+            }
+
+            return Promise.reject('Something went wrong while deploying the application')
+        }).then(() => {
+            return this.outputToDeploymentSummary(stdout);
+        });
     }
 
     tryInstallServerLessDependencies(fileSystem) {
@@ -39,5 +46,52 @@ export default class Deployer {
         return spawn({cmd: 'npm', args: ['install', '-g', 'https://github.com/sroze/serverless-openwhisk#uses-only-sub-directory-for-php', 'serverless']}).then(() => {
             return spawn({cmd: 'npm', args: ['link', 'serverless-openwhisk']});
         });
+    }
+
+    outputToDeploymentSummary(stdout) {
+        let summary = {
+            functions: [],
+            endpoints: [],
+        };
+
+        // Search for API-gateway endpoints
+        let re = /\n([A-Z]+) ([a-z0-9:\/\.-]+) --> ([a-z0-9-]+)/g;
+        let m;
+        do {
+            if (m = re.exec(stdout)) {
+                summary.endpoints.push({
+                    method: m[1],
+                    url: m[2],
+                    actionName: m[3]
+                });
+            }
+        } while (m);
+
+        let endpointByActionName = (endpoints, actionName) => {
+            for (let i = 0; i < endpoints.length; i++) {
+                if (endpoints[i].actionName == actionName) {
+                    return endpoints[i];
+                }
+            }
+
+            return null;
+        };
+
+        // Search for function
+        re = /Compiled Function \(([a-z0-9-]+)\): (\{.+\})/g;
+        do {
+            if (m = re.exec(stdout)) {
+                var functionConfiguration = JSON.parse(m[2]);
+
+                summary.functions.push({
+                    name: m[1],
+                    actionName: functionConfiguration.actionName,
+                    action: functionConfiguration.action,
+                    endpoint: endpointByActionName(summary.endpoints, functionConfiguration.actionName)
+                });
+            }
+        } while (m);
+
+        return summary;
     }
 }
