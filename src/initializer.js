@@ -74,7 +74,7 @@ export default class Initializer {
                     const { spawn } = require('./process');
                     const cmd =
                         'composer config extra.symfony.allow-contrib true' +
-                        '&& export SYMFONY_ENDPOINT=https://symfony.sh/r/github.com/symfony/recipes-contrib/124' +
+                        '&& export SYMFONY_ENDPOINT=https://symfony.sh/r/github.com/symfony/recipes-contrib/126' +
                         '&& composer req "sroze/openwhisk-bundle:^0.2"'
                     ;
 
