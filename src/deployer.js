@@ -12,7 +12,11 @@ export default class Deployer {
         return this.initializer.assertInitialized(fileSystem).then(() => {
             this.io.comment('Starting the deployment...');
 
-            return this.startDeployment(fileSystem)
+            return this.startDeployment(fileSystem).then(summary => {
+                this.debug && this.io.write('Deployment is finished: '+JSON.stringify(summary));
+
+                return summary;
+            })
         })
     }
 
@@ -28,16 +32,22 @@ export default class Deployer {
                     this.io.comment('Deployment successful!')
                 }
             });
-        }}).catch(code => {
+        }}).then(() => {
+            this.debug && this.io.write('Deployment is finished, generating the summary.');
+
+            return this.outputToDeploymentSummary(stdout);
+        }, code => {
             if (tryResolveIssues && stdout.indexOf('Serverless plugin "serverless-openwhisk" not found.')) {
+                this.debug && this.io.write('Serverless plugin "serverless-openwhisk" not found. Trying to install it.');
+
                 return this.tryInstallServerLessDependencies(fileSystem).then(() => {
+                    this.debug && this.io.write('Installed serverless dependencies.');
+
                     return this.startDeployment(fileSystem, false)
                 })
             }
 
             return Promise.reject('Something went wrong while deploying the application')
-        }).then(() => {
-            return this.outputToDeploymentSummary(stdout);
         });
     }
 

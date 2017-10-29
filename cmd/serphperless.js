@@ -37,7 +37,7 @@ const main = async (argv_) => {
                         ], true)
                     }
                 });
-            }).catch(handleUnexpected);
+            }).catch(handleRejection);
         });
 
     program.parse(process.argv);
