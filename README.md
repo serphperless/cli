@@ -43,4 +43,9 @@ serphperless deploy
 
 ## How it works
 
+In the given order, serphperless will:
+1. Ensure the [Serverless framework](https://github.com/serverless/serverless) is installed in your project.
+2. Create the Symfony configuration for Serverless if it do not exists
+3. Run the deployment with the Serverless framework
+
 
