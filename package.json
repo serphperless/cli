@@ -19,5 +19,27 @@
     "fs-extra": "^4.0.2",
     "inquirer": "^3.3.0",
     "symfony-style-console": "^0.2.0"
-  }
+  },
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/serphperless/cli.git"
+  },
+  "keywords": [
+    "serverless",
+    "symfony",
+    "php"
+  ],
+  "bugs": {
+    "url": "https://github.com/serphperless/cli/issues"
+  },
+  "bin": {
+    "serphperless": "./dist/serphperless.js"
+  },
+  "homepage": "https://github.com/serphperless/cli#readme"
 }
