@@ -1,6 +1,6 @@
 {
   "name": "serphperless",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Blazing fast PHP function deployment",
   "main": "dist/serphperless.js",
   "author": "Samuel Roze",

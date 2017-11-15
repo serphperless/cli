@@ -11,7 +11,7 @@ import Filesystem from '../src/filesystem.js';
 
 const main = async (argv_) => {
     program
-        .version('0.1.0')
+        .version('0.1.3')
         .option('-d, --debug', 'Enable the debug mode')
     ;
 

@@ -1,5 +1,6 @@
 build:
 	npx webpack
+	chmod +x dist/serphperless.js
 
-publish:
-	npx webpack && npm publish
+publish: build
+	npm publish
